@@ -1,6 +1,13 @@
+interface EmailParams {
+  from: string;
+  to: string;
+  subject: string;
+  html: string;
+}
+
 const mail = {
   emails: {
-    send: async ({ from, to, subject, html }: any) => {
+    send: async ({ from, to, subject, html }: EmailParams) => {
       console.log(`[MOCK EMAIL]
         From: ${from}
         To: ${to}
