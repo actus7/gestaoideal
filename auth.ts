@@ -28,9 +28,9 @@ export const {
 	providers: [
 		Credentials({
 			async authorize(credentials) {
-				const validdCredentials = CredentialsSchema.safeParse(credentials);
-				if (validdCredentials.success) {
-					const { email, password } = validdCredentials.data;
+				const validCredentials = CredentialsSchema.safeParse(credentials);
+				if (validCredentials.success) {
+					const { email, password } = validCredentials.data;
 					const user = await findUserbyEmail(email);
 					if (!user || !user.password) {
 						throw new UserNotFound();
