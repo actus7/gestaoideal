@@ -3,7 +3,6 @@
 import { prisma } from "@/lib/db";
 import { RegisterSchema } from "@/schemas/auth";
 import { createVerificationToken } from "@/services/auth";
-import { UserRole } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import bcryptjs from "bcryptjs";
 import type { z } from "zod";
@@ -31,7 +30,7 @@ export const register = async (user: z.infer<typeof RegisterSchema>) => {
 				name,
 				email,
 				password: hashedPassword,
-				role: UserRole.DEFAULT,
+				role: "DEFAULT",
 			},
 		});
 		//Account verification flow with e-mail

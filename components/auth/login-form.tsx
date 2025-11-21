@@ -13,13 +13,11 @@ import type { z } from "zod";
 
 import { login } from "@/actions/auth";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/ui/input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { CredentialsSchema } from "@/schemas/auth";
 import { LoaderIcon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { Separator } from "../ui/separator";
 import AuthFormMessage from "./auth-form-message";
-import SocialLogin from "./social-login";
 
 export default function LoginForm() {
 	const [isPending, startTransition] = useTransition();
@@ -38,13 +36,14 @@ export default function LoginForm() {
 	});
 
 	const onSubmit = async (values: z.infer<typeof CredentialsSchema>) => {
+		setError("");
+		setSuccess("");
 		startTransition(async () => {
 			try {
 				const resp = await login(values);
 
 				if (!resp) {
 					setError("Resposta inválida do servidor");
-					setSuccess("");
 					form.reset();
 					return;
 				}
@@ -55,7 +54,6 @@ export default function LoginForm() {
 					setShowOTP(true);
 					if (resp.error) {
 						setError(resp.error);
-						setSuccess("");
 						return;
 					}
 					return;
@@ -63,20 +61,17 @@ export default function LoginForm() {
 
 				if (error) {
 					setError(resp.error);
-					setSuccess("");
 					form.reset();
 					return;
 				}
 				if (success) {
 					setSuccess(resp.success);
-					setError("");
 					return;
 				}
 
 				form.reset();
 			} catch (err) {
 				setError("Algo deu errado");
-				setSuccess("");
 				form.reset();
 			}
 		});
@@ -118,10 +113,10 @@ export default function LoginForm() {
 											<FormControl>
 												<div>
 													<Input type="password" placeholder="******" required {...field} disabled={isPending} />
-													<div className="flex items-center">
+													<div className="flex items-center mt-2">
 														<Link
 															href="/auth/reset-password"
-															className="ml-auto inline-block text-sm text-secondary-foreground underline"
+															className="ml-auto inline-block text-sm text-muted-foreground underline hover:text-primary"
 														>
 															Esqueceu a senha?
 														</Link>
@@ -149,22 +144,24 @@ export default function LoginForm() {
 									name="code"
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>Código</FormLabel>
+											<FormLabel>Código de Verificação</FormLabel>
 											<FormControl>
-												<InputOTP maxLength={6} {...field}>
-													<InputOTPGroup>
-														<InputOTPSlot index={0} />
-														<InputOTPSlot index={1} />
-														<InputOTPSlot index={2} />
-													</InputOTPGroup>
-													<InputOTPGroup>
-														<InputOTPSlot index={3} />
-														<InputOTPSlot index={4} />
-														<InputOTPSlot index={5} />
-													</InputOTPGroup>
-												</InputOTP>
+												<div className="flex justify-center">
+													<InputOTP maxLength={6} {...field}>
+														<InputOTPGroup>
+															<InputOTPSlot index={0} />
+															<InputOTPSlot index={1} />
+															<InputOTPSlot index={2} />
+															<InputOTPSlot index={3} />
+															<InputOTPSlot index={4} />
+															<InputOTPSlot index={5} />
+														</InputOTPGroup>
+													</InputOTP>
+												</div>
 											</FormControl>
-											<FormDescription>Favor entrar com o códio enviado por e-mail</FormDescription>
+											<FormDescription className="text-center">
+												Digite o código enviado para seu e-mail.
+											</FormDescription>
 											<FormMessage />
 										</FormItem>
 									)}
@@ -179,13 +176,10 @@ export default function LoginForm() {
 					</form>
 				</Form>
 
-				<Separator />
-				<SocialLogin />
-
 				{!showOTPForm && (
 					<div className="mt-4 text-center text-sm">
 						Não tem uma conta?{" "}
-						<Link href="/auth/register" className="underline">
+						<Link href="/auth/register" className="underline text-primary hover:text-primary/80">
 							Cadastre-se
 						</Link>
 					</div>
@@ -193,7 +187,7 @@ export default function LoginForm() {
 				{showOTPForm && (
 					<div className="mt-4 text-center text-sm">
 						Conectar agora?{" "}
-						<Link href="/auth/login" className="underline">
+						<Link href="/auth/login" className="underline text-primary hover:text-primary/80">
 							Conectar
 						</Link>
 					</div>
