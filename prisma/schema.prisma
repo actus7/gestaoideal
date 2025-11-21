@@ -5,17 +5,12 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
-}
-
-enum UserRole {
-  DEFAULT
-  ADMIN
 }
 
 model User {
@@ -24,7 +19,7 @@ model User {
   email                  String    @unique
   emailVerified          DateTime?
   image                  String?
-  role                   UserRole  @default(DEFAULT)
+  role                   String    @default("DEFAULT")
   password               String?
   isTwoFactorAuthEnabled Boolean   @default(false)
   twoFactorAuthVerified  DateTime?

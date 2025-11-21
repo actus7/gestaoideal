@@ -1,11 +1,15 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { UserRole } from "@prisma/client";
+import bcryptjs from "bcryptjs";
 import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
 import authConfig from "./auth.config";
+import { UserNotFound } from "./lib/auth";
 import { prisma } from "./lib/db";
+import { CredentialsSchema } from "./schemas/auth";
 import { findUserbyEmail } from "./services";
 import { isTwoFactorAutenticationEnabled } from "./services/auth";
 import { findOrgByOwnerId } from "./services/onboarding/org";
+
 export const {
 	handlers: { GET, POST },
 	auth,
@@ -20,11 +24,26 @@ export const {
 	pages: {
 		signIn: "/auth/login",
 	},
+	...authConfig,
+	providers: [
+		Credentials({
+			async authorize(credentials) {
+				const validCredentials = CredentialsSchema.safeParse(credentials);
+				if (validCredentials.success) {
+					const { email, password } = validCredentials.data;
+					const user = await findUserbyEmail(email);
+					if (!user || !user.password) {
+						throw new UserNotFound();
+					}
+					const validPassword = await bcryptjs.compare(password, user.password);
+					if (validPassword) return user;
+				}
+				return null;
+			},
+		}),
+	],
 	callbacks: {
 		async signIn({ user, email, account, profile }) {
-			if (account && (account.provider === "google" || account.provider === "github")) {
-				return true;
-			}
 			if (user.email) {
 				const registeredUser = await findUserbyEmail(user?.email);
 				if (!registeredUser?.emailVerified) return false;
@@ -44,7 +63,7 @@ export const {
 					const org = await findOrgByOwnerId(user.id);
 					token.orgId = org?.id || "";
 					if (org?.id) {
-						token.role = UserRole.ADMIN;
+						token.role = "ADMIN";
 					}
 				}
 			}
@@ -67,5 +86,4 @@ export const {
 			};
 		},
 	},
-	...authConfig,
 });
