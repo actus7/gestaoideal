@@ -31,6 +31,8 @@ export default function RegisterForm() {
 	});
 
 	const onSubmit = async (values: z.infer<typeof RegisterSchema>) => {
+		setError("");
+		setSuccess("");
 		startTransition(async () => {
 			try {
 				const { success, error } = await register(values);
@@ -46,7 +48,7 @@ export default function RegisterForm() {
 	};
 
 	return (
-		<AuthCard title="Registre-se" description="Seja bem-vindo">
+		<AuthCard title="Crie sua conta" description="Comece agora gratuitamente">
 			<div className="space-y-4">
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)}>
@@ -56,18 +58,16 @@ export default function RegisterForm() {
 								name="name"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Name</FormLabel>
+										<FormLabel>Nome</FormLabel>
 										<FormControl>
 											<Input
-												autoComplete="off"
-												type="name"
-												placeholder="Jose da Silva"
+												autoComplete="name"
+												placeholder="Seu nome completo"
 												required
 												{...field}
 												disabled={isPending}
 											/>
 										</FormControl>
-										<FormDescription className="hidden">Seu nome.</FormDescription>
 										<FormMessage />
 									</FormItem>
 								)}
@@ -79,9 +79,14 @@ export default function RegisterForm() {
 									<FormItem>
 										<FormLabel>E-mail</FormLabel>
 										<FormControl>
-											<Input type="email" placeholder="voce@provedor.com.br" required {...field} disabled={isPending} />
+											<Input
+												type="email"
+												placeholder="voce@exemplo.com"
+												required
+												{...field}
+												disabled={isPending}
+											/>
 										</FormControl>
-										<FormDescription className="hidden">Seu e-mail.</FormDescription>
 										<FormMessage />
 									</FormItem>
 								)}
@@ -93,9 +98,14 @@ export default function RegisterForm() {
 									<FormItem>
 										<FormLabel>Senha</FormLabel>
 										<FormControl>
-											<Input type="password" placeholder="******" required {...field} disabled={isPending} />
+											<Input
+												type="password"
+												placeholder="******"
+												required
+												{...field}
+												disabled={isPending}
+											/>
 										</FormControl>
-										<FormDescription className="hidden">Seu e-mail.</FormDescription>
 										<FormMessage />
 									</FormItem>
 								)}
@@ -112,8 +122,8 @@ export default function RegisterForm() {
 
 				<div className="mt-4 text-center text-sm">
 					Já tem uma conta?{" "}
-					<Link href="/auth/login" className="underline">
-						Efetue Login
+					<Link href="/auth/login" className="underline text-primary hover:text-primary/80">
+						Entrar
 					</Link>
 				</div>
 			</div>
